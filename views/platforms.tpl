@@ -1,5 +1,5 @@
 % rebase('base.tpl')
 
-% for shortName, displayName in platforms.items():
-	<a href="/platforms/{{shortName}}"><img src="images/{{shortName}}.png" alt="{{displayName}}"></img></a>
+% for p in platforms:
+	<a href="/platforms/{{p.get_id()}}"><img src="images/{{p.get_id()}}.png" alt="{{p.get_name()}}"></img></a>
 % end

@@ -2,6 +2,8 @@ import re
 import os
 import shutil
 import yaml
+from typing import List
+from steam_buddy.platform import Platform
 from steam_buddy.config import SHORTCUT_DIR
 
 
@@ -73,3 +75,14 @@ def delete_file(base_dir, platform, name):
         shutil.rmtree(file_dir)
 
     delete_file_link(base_dir, platform, name)
+
+
+class PlatformNotFoundException(Exception):
+    pass
+
+
+def get_platform_by_id(platform_id: str, platforms: List[Platform]) -> Platform:
+    for platform in platforms:
+        if platform.get_id() == platform_id:
+            return platform
+    raise PlatformNotFoundException("Platform {} not found!".format(platform_id))

@@ -3,8 +3,25 @@ import subprocess
 import json
 import yaml
 from bottle import Bottle, template, static_file, redirect, abort, request, response
-from steam_buddy.config import PLATFORMS, FLATHUB_HANDLER, RESOURCE_DIR, BANNER_DIR, CONTENT_DIR, SHORTCUT_DIR
-from steam_buddy.functions import load_shortcuts, sanitize, upsert_file, delete_file
+from steam_buddy.config import RESOURCE_DIR, BANNER_DIR, CONTENT_DIR, SHORTCUT_DIR
+from steam_buddy.functions import load_shortcuts, sanitize, upsert_file, delete_file, get_platform_by_id
+from steam_buddy.emulator import Emulator
+from steam_buddy.flathub import Flathub
+
+
+FLATHUB_HANDLER = Flathub("", "")
+
+PLATFORMS = [
+    Emulator("gb", "Game Boy"),
+    Emulator("gba", "Game Boy Advance"),
+    Emulator("gbc", "Game Boy Color"),
+    Emulator("sgg", "Game Gear"),
+    Emulator("sms", "Master System"),
+    Emulator("nes", "Nintendo"),
+    Emulator("n64", "Nintendo 64"),
+    Emulator("snes", "Super Nintendo"),
+    Emulator("tg-16", "TurboGrafx-16"),
+]
 
 server = Bottle()
 
@@ -14,24 +31,10 @@ def root():
     return template('platforms.tpl', platforms=PLATFORMS)
 
 
-@server.route('/platforms/<platform>')
-def platform(platform):
-    if platform == "flathub":
-        return template('flathub', app_list=FLATHUB_HANDLER.get_installed_applications(), isInstalledOverview=True,
-                        platform=platform, platformName=PLATFORMS[platform])
-    shortcuts = sorted(load_shortcuts(platform), key=lambda s: s['name'])
-    data = []
-    for shortcut in shortcuts:
-        filename = None
-        banner = None
-        hidden = 'hidden' if 'hidden' in shortcut and shortcut['hidden'] else ''
-        if 'banner' in shortcut:
-            filename = os.path.basename(shortcut['banner'])
-            banner = '/banners/{platform}/{filename}'.format(platform=platform, name=shortcut['name'],
-                                                             filename=filename)
-        data.append({'hidden': hidden, 'filename': filename, 'banner': banner, 'name': shortcut['name']})
-
-    return template('platform.tpl', shortcuts=data, platform=platform, platformName=PLATFORMS[platform])
+@server.route('/platforms/<platform_id>')
+def platform_app_list(platform_id):
+    platform = get_platform_by_id(platform_id, PLATFORMS)
+    return template('platform.tpl', platform=platform, apps=platform.get_installed_apps())
 
 
 @server.route('/banners/<platform>/<filename>')

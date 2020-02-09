@@ -1,13 +1,16 @@
 import subprocess
 from typing import List, Dict
 from steam_buddy.flathub.whitelist import whitelist
+from steam_buddy.platform import PlatformWithRemoteContent
+from steam_buddy.app import App
 from steam_buddy.flathub.application import Application
 import requests
 
 
-class Flathub:
+class Flathub(PlatformWithRemoteContent):
 
-    def __init__(self):
+    def __init__(self, name: str, platform_id: str):
+        super().__init__(name, platform_id)
         try:
             flathub_url = "https://dl.flathub.org/repo/flathub.flatpakrepo"
             self.__add_repo("flathub", flathub_url)
@@ -47,7 +50,7 @@ class Flathub:
                 applications.append(application)
         return applications
 
-    def get_available_applications(self) -> List[Application]:
+    def get_available_apps(self) -> List[App]:
         applications = []
         for application in self.__applications:
             # Don't add if the whitelist is enabled and the app isn't in it
@@ -57,7 +60,7 @@ class Flathub:
                 applications.append(application)
         return applications
 
-    def get_installed_applications(self) -> List[Application]:
+    def get_installed_apps(self) -> List[Application]:
         applications = []
         for application in self.__applications:
             if application.installed and application.flatpak_id in whitelist and not application.busy:

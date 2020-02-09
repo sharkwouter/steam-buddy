@@ -200,12 +200,12 @@
 	<div class="header">
 		<a href="/">Home</a>
 		% if get('platform') :
-			<em>/</em> <a href="/platforms/{{platform}}">{{platformName}}</a>
+			<em>/</em> <a href="/platforms/{{platform.get_id()}}">{{platform.get_name()}}</a>
 
 			% if get('name') :
-				<em>/</em> <a href="/platforms/{{platform}}/edit/{{name}}">{{name}}</a>
+				<em>/</em> <a href="/platforms/{{platform.get_id()}}/edit/{{name}}">{{name}}</a>
 			% elif get('isNew') :
-				<em>/</em> <a href="/platforms/{{platform}}/new">New</a>
+				<em>/</em> <a href="/platforms/{{platform.get_id()}}/new">New</a>
 			% end
 		% end
 		<div class="right">
