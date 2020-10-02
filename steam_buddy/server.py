@@ -98,9 +98,11 @@ def flathub_images(filename):
 def images(filename):
     return static_file(filename, root=os.path.join(RESOURCE_DIR, 'images'))
 
+
 @route('/public/<filename>')
 def images(filename):
     return static_file(filename, root='public')
+
 
 @route('/shortcuts/new', method='POST')
 @authenticate
@@ -143,11 +145,12 @@ def shortcut_create():
         del tmpfiles[content]
         content_path = upsert_file(content_src_path, CONTENT_DIR, platform, name, content_dst_name)
 
-    shortcut = {}
-    shortcut['name'] = name
-    shortcut['cmd'] = platform
-    shortcut['hidden'] = hidden == 'on'
-    shortcut['tags'] = [PLATFORMS[platform]]
+    shortcut = {
+        'name': name,
+        'cmd': platform,
+        'hidden': hidden == 'on',
+        'tags': [PLATFORMS[platform]]
+    }
     if banner or banner_url:
         shortcut['banner'] = banner_path
     if content:
@@ -190,7 +193,7 @@ def shortcut_update():
             banner_file.write(download.content)
 
     if content:
-        ( content_src_path, content_dst_name ) = tmpfiles[content]
+        (content_src_path, content_dst_name) = tmpfiles[content]
         del tmpfiles[content]
         content_path = upsert_file(content_src_path, CONTENT_DIR, platform, name, content_dst_name)
 
@@ -228,6 +231,7 @@ def shortcut_delete():
 
     redirect('/platforms/{platform}'.format(platform=platform))
 
+
 @route('/shortcuts/file-upload', method='POST')
 @authenticate
 def start_file_upload():
@@ -246,6 +250,7 @@ def start_file_upload():
 
     return key
 
+
 @route('/shortcuts/file-upload', method='PATCH')
 @authenticate
 def upload_file_chunk():
@@ -261,10 +266,12 @@ def upload_file_chunk():
     f.write(request.body.read())
     f.close()
 
+
 @route('/shortcuts/file-upload', method='HEAD')
 @authenticate
 def check_file_upload():
     return 0
+
 
 @route('/shortcuts/file-upload', method='DELETE')
 @authenticate
@@ -276,6 +283,7 @@ def delete_file_upload():
 
     del tmpfiles[key]
     os.remove(path)
+
 
 @route('/flathub/install/<flatpak_id>')
 @authenticate
